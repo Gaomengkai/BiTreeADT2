@@ -34,14 +34,6 @@ typedef struct
     int length;
 }TREELISTS;
 
-//TREELISTS treelist;
-//BiTree T, address;
-//int num;
-//TElemType  defination[20], temp1;
-//int nums[20]£¬ result, key, LR;
-//char treename[20], filename[20];
-//TElemType* cp;
-
 status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree T, TElemType definition[], int repeating[]);
 status CreateBiTree(BiTree T, TElemType definition[]);
 status ClearBiTree(BiTree T);

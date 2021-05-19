@@ -1,7 +1,7 @@
 #include "Def.h"
 
 status CreateBiTreeTrueFunctionToDoCheckRepeating(
-    BiTree     T,
+    BiTree      T,
     TElemType   definition[],
     int         repeating[], 
     TElemType*  &cp) {
@@ -420,7 +420,7 @@ int LocateTree(TREELISTS treelist, char ListName[])// 查找二叉树
 
 status SaveBiTree(BiTree T, char FileName[]) //将二叉树的结点数据写入到文件FileName中
 {
-    char rs[] = "null";
+    char rs[100] = "null";
     FILE* fp = fopen(FileName, "wt");
     if (!fp) return FILEERROR;
     BiTree s[100];
