@@ -1,7 +1,7 @@
 #include "Def.h"
 
 status CreateBiTreeTrueFunctionToDoCheckRepeating(
-    BiTree&     T,
+    BiTree     T,
     TElemType   definition[],
     int         repeating[], 
     TElemType*  &cp) {
@@ -30,7 +30,7 @@ status CreateBiTreeTrueFunctionToDoCheckRepeating(
     }
 }
 
-status CreateBiTree(BiTree& T, TElemType definition[])//构造二叉树
+status CreateBiTree(BiTree T, TElemType definition[])//构造二叉树
 {
     const int DEFINITION_NUM = 1000;
     int repeating[DEFINITION_NUM];
@@ -39,7 +39,7 @@ status CreateBiTree(BiTree& T, TElemType definition[])//构造二叉树
     return CreateBiTreeTrueFunctionToDoCheckRepeating(T, definition, repeating, cp);
 }
 
-status ClearBiTree(BiTree& T)//清空二叉树
+status ClearBiTree(BiTree T)//清空二叉树
 {
     if (!T) return OK;
     ClearBiTree(T->lchild);
@@ -176,6 +176,7 @@ status InsertNode(BiTree& T, KeyType e, int LR, TElemType c)  //插入结点。
         r->lchild = NULL;
         return OK;
     }
+    return ERROR;
 }
 
 BiTree FindParent(BiTree T, KeyType e)  //自行添加用于查找双亲结点的函数
@@ -336,6 +337,7 @@ status InOrderTraverse(BiTree T, void (*visit)(BiTree))  //中序遍历二叉树T（非递
             t = t->rchild; //遍历右子树
         }
     } while (top || t);
+    return ERROR;
 }
 
 status PostOrderTraverse(BiTree T, void (*visit)(BiTree))  //后序遍历二叉树T
@@ -375,14 +377,19 @@ status LevelOrderTraverse(BiTree T, void (*visit)(BiTree))   //按层遍历二叉树T
 
 status AddBiTree(TREELISTS& treelist, char treename[])
 {
-    TElemType defination[20];
-    if (treelist.length == 10)   return ERROR;
+    if (treelist.length >= 10)   return ERROR;
+    for (int i = 0; i < treelist.length; ++i) {
+        if (strcmp(treelist.elem[i].name, treename) == 0)
+            return ERROR;
+    }
+    /* ノードを初期化します */
     strcpy(treelist.elem[treelist.length].name, treename);
+    treelist.elem[treelist.length].T = NULL;
     treelist.length++;
     return OK;
 }
 
-status DelBiTree(TREELISTS& treelist, char treename[]) //删除二叉树
+status DelBiTree(TREELISTS& treelist, char treename[]) // 二分木を削除する
 {
     for (int i = 0; i < treelist.length; i++)
     {
@@ -415,7 +422,7 @@ status SaveBiTree(BiTree T, char FileName[]) //将二叉树的结点数据写入到文件FileN
 {
     char rs[] = "null";
     FILE* fp = fopen(FileName, "wt");
-    if (fp == NULL) exit(-1);
+    if (!fp) return FILEERROR;
     BiTree s[100];
     int top = 0;
     do
@@ -442,16 +449,17 @@ status SaveBiTree(BiTree T, char FileName[]) //将二叉树的结点数据写入到文件FileN
 
 status LoadBiTree(BiTree& T, char FileName[])  //读入文件FileName的结点数据，创建二叉树
 {
-    TElemType defination[20];
+    TElemType def1[20];
+    memset(def1, 0, sizeof(def1));
     FILE* fp = fopen(FileName, "r");
-    if (!fp) exit(-1);
+    if (!fp) return FILEERROR;
     for (int i = 0;; i++)
     {
-        fscanf(fp, "%d%s", &defination[i].key, defination[i].others);
-        if (defination[i].key == -1)
+        fscanf(fp, "%d%s", &def1[i].key, def1[i].others);
+        if (def1[i].key == -1)
             break;
     }
-    CreateBiTree(T, defination);
+    CreateBiTree(T, def1);
     fclose(fp);
     return OK;
 }

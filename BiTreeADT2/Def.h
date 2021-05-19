@@ -1,5 +1,7 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -11,7 +13,8 @@
 #define OK 1
 #define ERROR 0
 #define INFEASIBLE -1
-#define OVERFLOW -2
+#define FILEERROR -2
+// #define OVERFLOW -2
 typedef int status;
 typedef int KeyType;
 typedef struct {
@@ -39,9 +42,9 @@ typedef struct
 //char treename[20], filename[20];
 //TElemType* cp;
 
-status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree& T, TElemType definition[], int repeating[]);
-status CreateBiTree(BiTree& T, TElemType definition[]);
-status ClearBiTree(BiTree& T);
+status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree T, TElemType definition[], int repeating[]);
+status CreateBiTree(BiTree T, TElemType definition[]);
+status ClearBiTree(BiTree T);
 int BiTreeDepth(BiTree T);
 BiTNode* LocateNode(BiTree T, KeyType e);
 status FindRepetition(BiTree& T, KeyType e);
