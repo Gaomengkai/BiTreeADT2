@@ -221,7 +221,6 @@ status DeleteNode(BiTree& T, KeyType e)  //删除结点。
     //if (!parent) return ERROR;
     if (!Loc_e->lchild && !Loc_e->rchild && parent) // Case: e has no child (e is a leaf)
     {
-        //printf("dafafafaf");
         if (parent->lchild == Loc_e)  parent->lchild = NULL;
         if (parent->rchild == Loc_e)  parent->rchild = NULL;
         free(Loc_e);
@@ -232,8 +231,10 @@ status DeleteNode(BiTree& T, KeyType e)  //删除结点。
     if (Loc_e != T)
     {
         if (!parent) return ERROR;
-        if (!parent->rchild) pl = parent->lchild;
-        if (!parent->lchild) pr = parent->rchild;
+        if (parent->lchild == Loc_e)
+            pl = Loc_e;
+        else if (parent->rchild == Loc_e)
+            pr = Loc_e;
     }
     else {/* eはルートノードです */
         if (Loc_e->lchild == NULL && Loc_e->rchild)  //deg == 1
@@ -265,7 +266,7 @@ status DeleteNode(BiTree& T, KeyType e)  //删除结点。
     {
         if (pl)
             parent->lchild = Loc_e->lchild;//parent为空指针的情况在上面已经讨论过
-        if (pr)
+        else if (pr)
             parent->rchild = Loc_e->lchild;
         free(Loc_e);
         Loc_e = NULL;
@@ -274,7 +275,7 @@ status DeleteNode(BiTree& T, KeyType e)  //删除结点。
     {
         if (pl)
             parent->lchild = Loc_e->rchild;
-        if (pr)
+        else if (pr)
             parent->rchild = Loc_e->rchild;
         free(Loc_e);
         Loc_e = NULL;
