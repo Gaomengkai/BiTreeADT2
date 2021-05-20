@@ -10,3 +10,5 @@
 #include <algorithm>
 
 #include "Def.h"
+
+#define MAX_N_NODES 1000

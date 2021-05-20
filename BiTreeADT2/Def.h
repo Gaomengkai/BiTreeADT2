@@ -14,6 +14,10 @@
 #define ERROR 0
 #define INFEASIBLE -1
 #define FILEERROR -2
+
+#define ASSERT_NOT_EMPTY if(isEmpty(T)) return INFEASIBLE;
+#define ASSERT_EMPTY if(!isEmpty(T)) return INFEASIBLE;
+
 // #define OVERFLOW -2
 typedef int status;
 typedef int KeyType;
@@ -55,3 +59,9 @@ status DelBiTree(TREELISTS& treelist, char treename[]);
 int LocateTree(TREELISTS treelist, char ListName[]);
 status SaveBiTree(BiTree T, char FileName[]);
 status LoadBiTree(BiTree& T, char FileName[]);
+
+// Custom Functions to avoid trash code
+inline bool isEmpty(BiTree T);
+const int ROOT = -1;
+const int LEFT = 0;
+const int RIGHT = 1;
