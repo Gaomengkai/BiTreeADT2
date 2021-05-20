@@ -1,466 +1,477 @@
-#include "Def.h"
+ï»¿#include "Def.h"
 
-status CreateBiTreeTrueFunctionToDoCheckRepeating(
-	BiTree      T,
-	TElemType   definition[],
-	int         repeating[],
-	TElemType*& cp) {
+status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree& T,
+                                                  TElemType definition[],
+                                                  int repeating[],
+                                                  TElemType *&cp) {
 
-	if (definition[0].key == 0) {
-		T = NULL;
-		return OK;
-	}
-	else {
-		status flag;
-		// Check if it is fxxking repeated
-		if (repeating[definition[0].key] == 1 && definition[0].key > 0)
-			return ERROR;
-		else repeating[definition[0].key] = 1;
+    if (definition[0].key == 0) {
+        T = NULL;
+        return OK;
+    } else {
+        status flag;
+        // Check if it is fxxking repeated
+        if (repeating[definition[0].key] == 1 && definition[0].key > 0)
+            return ERROR;
+        else
+            repeating[definition[0].key] = 1;
+        T = new BiTNode;
+        if (!T)return OVERFLOW;
 
-		if (!(T = (BiTNode*)malloc(sizeof(BiTNode))))
-			return OVERFLOW;
-		T->data = definition[0]; // Éú³É¸ù½áµã
-		cp = definition;
-		cp = cp + 1;
-		flag = CreateBiTreeTrueFunctionToDoCheckRepeating(T->lchild, cp, repeating, cp); // ¹¹Ôì×ó×ÓÊ÷
-		if (flag == ERROR) return ERROR;
-		cp = cp + 1;
-		flag = CreateBiTreeTrueFunctionToDoCheckRepeating(T->rchild, cp, repeating, cp); // ¹¹ÔìÓÒ×ÓÊ÷
-		if (flag == ERROR) return ERROR;
-		return OK;
-	}
+        T->data = definition[0]; // ç”Ÿæˆæ ¹ç»“ç‚¹
+        cp = definition;
+        cp = cp + 1;
+        flag = CreateBiTreeTrueFunctionToDoCheckRepeating(
+            T->lchild, cp, repeating, cp); // æ„é€ å·¦å­æ ‘
+        if (flag == ERROR)
+            return ERROR;
+        cp = cp + 1;
+        flag = CreateBiTreeTrueFunctionToDoCheckRepeating(
+            T->rchild, cp, repeating, cp); // æ„é€ å³å­æ ‘
+        if (flag == ERROR)
+            return ERROR;
+        return OK;
+    }
 }
 
-status CreateBiTree(BiTree T, TElemType definition[])//¹¹Ôì¶ş²æÊ÷
+status CreateBiTree(BiTree& T, TElemType definition[]) //æ„é€ äºŒå‰æ ‘
 {
-	ASSERT_EMPTY;
-	if (!isEmpty(T)) return INFEASIBLE;
-	const int DEFINITION_NUM = 1000;
-	int repeating[DEFINITION_NUM];
-	memset(repeating, 0, sizeof(repeating));
-	auto cp = definition;
-	return CreateBiTreeTrueFunctionToDoCheckRepeating(T, definition, repeating, cp);
+    ASSERT_EMPTY;
+    if (!isEmpty(T))
+        return INFEASIBLE;
+    const int DEFINITION_NUM = 1000;
+    int repeating[DEFINITION_NUM];
+    memset(repeating, 0, sizeof(repeating));
+    auto cp = definition;
+    return CreateBiTreeTrueFunctionToDoCheckRepeating(T, definition, repeating,
+                                                      cp);
 }
 
-status ClearBiTree(BiTree T)//Çå¿Õ¶ş²æÊ÷
+status ClearBiTree(BiTree& T) //æ¸…ç©ºäºŒå‰æ ‘
 {
-	if (!T) return OK;
-	ClearBiTree(T->lchild);
-	ClearBiTree(T->rchild);
-	free(T);
-	T = NULL;
-	return OK;
+    if (!T)
+        return OK;
+    ClearBiTree(T->lchild);
+    ClearBiTree(T->rchild);
+    free(T);
+    T = NULL;
+    return OK;
 }
 
-int BiTreeDepth(BiTree T) //Çó¶ş²æÊ÷TµÄÉî¶È
+int BiTreeDepth(BiTree T) //æ±‚äºŒå‰æ ‘Tçš„æ·±åº¦
 {
-	ASSERT_NOT_EMPTY;
-	int depth = 0;
-	depth++;
-	depth += BiTreeDepth(T->lchild) > BiTreeDepth(T->rchild) ? BiTreeDepth(T->lchild) : BiTreeDepth(T->rchild);
-	return depth;
+    if (!T) return 0;
+    int depth = 0;
+    depth++;
+    depth += BiTreeDepth(T->lchild) > BiTreeDepth(T->rchild)
+                 ? BiTreeDepth(T->lchild)
+                 : BiTreeDepth(T->rchild);
+    return depth;
 }
 
-BiTNode* LocateNode(BiTree T, KeyType e)  //²éÕÒ½áµã
+BiTNode *LocateNode(BiTree T, KeyType e) //æŸ¥æ‰¾ç»“ç‚¹
 {
-	BiTNode* flag = NULL;
-	if (!T) return flag;
-	if ((T->data).key == e)
-	{
-		flag = T;
-		return flag;
-	}
-	flag = LocateNode(T->lchild, e);
-	if (flag != NULL) return flag;
-	flag = LocateNode(T->rchild, e);
-	if (flag != NULL) return flag;
-	return flag;
+    BiTNode *flag = NULL;
+    if (!T)
+        return flag;
+    if ((T->data).key == e) {
+        flag = T;
+        return flag;
+    }
+    flag = LocateNode(T->lchild, e);
+    if (flag != NULL)
+        return flag;
+    flag = LocateNode(T->rchild, e);
+    if (flag != NULL)
+        return flag;
+    return flag;
 }
 
-status FindRepetition(BiTree& T, KeyType e) {
-	/// <summary>
-	/// ÅĞ¶ÏÊÇ·ñÓĞkeyÎªeµÄ½áµã
-	/// </summary>
-	/// <param name="T"></param>
-	/// <param name="e"></param>
-	/// <returns></returns>
-	ASSERT_NOT_EMPTY;
-	int flag = OK;
-	if (!T)
-	{
-		return OK;
-	}
-	else
-	{
-		if ((T->data).key == e) return ERROR;
-		flag = FindRepetition(T->lchild, e);
-		if (flag == ERROR) return ERROR;
-		flag = FindRepetition(T->rchild, e);
-		if (flag == ERROR) return ERROR;
-		return flag;
-	}
+status FindRepetition(BiTree &T, KeyType e) {
+    /// <summary>
+    /// åˆ¤æ–­æ˜¯å¦æœ‰keyä¸ºeçš„ç»“ç‚¹
+    /// </summary>
+    /// <param name="T"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    ASSERT_NOT_EMPTY;
+    int flag = OK;
+    if (!T) {
+        return OK;
+    } else {
+        if ((T->data).key == e)
+            return ERROR;
+        flag = FindRepetition(T->lchild, e);
+        if (flag == ERROR)
+            return ERROR;
+        flag = FindRepetition(T->rchild, e);
+        if (flag == ERROR)
+            return ERROR;
+        return flag;
+    }
 }
 
-status Assign(BiTree& T, KeyType e, TElemType valve)  //ÊµÏÖ½áµã¸³Öµ¡£   ******
+status Assign(BiTree &T, KeyType e, TElemType valve) //å®ç°ç»“ç‚¹èµ‹å€¼ã€‚   ******
 {
-	ASSERT_NOT_EMPTY;
-	BiTree flag;
-	int res;
-	if (e != valve.key)
-	{
-		res = FindRepetition(T, valve.key);
-		if (res == ERROR)
-			return ERROR;
-	}
-	flag = LocateNode(T, e);
-	if (flag == NULL) return ERROR;
-	(flag->data).key = valve.key;
-	strcpy((flag->data).others, valve.others);
-	return OK;
+    ASSERT_NOT_EMPTY;
+    BiTree flag;
+    int res;
+    if (e != valve.key) {
+        res = FindRepetition(T, valve.key);
+        if (res == ERROR)
+            return ERROR;
+    }
+    flag = LocateNode(T, e);
+    if (flag == NULL)
+        return ERROR;
+    (flag->data).key = valve.key;
+    strcpy((flag->data).others, valve.others);
+    return OK;
 }
 
-BiTNode* GetSibling(BiTree T, KeyType e) {
-	/// <summary>
-	/// ĞÖµÜ¥Î©`¥É¤òÈ¡µÃ¤¹¤ë
-	/// </summary>
-	/// <param name="T"></param>
-	/// <param name="e"></param>
-	/// <returns></returns>
-	BiTNode* flag = NULL;
-	if (!T) return flag;
-	if (T->lchild == NULL || T->rchild == NULL) return flag; //ÏÈÕÒË«Ç×½áµã
-	else
-		if ((T->lchild->data).key == e)
-		{
-			flag = T->rchild;
-			return flag;
-		}
-		else if ((T->rchild->data).key == e)
-		{
-			flag = T->lchild;
-			return flag;
-		}
-	flag = GetSibling(T->lchild, e);
-	if (flag != NULL) return flag;
-	flag = GetSibling(T->rchild, e);
-	if (flag != NULL) return flag;
-	return flag;
+BiTNode *GetSibling(BiTree T, KeyType e) {
+    /// <summary>
+    /// å…„å¼Ÿãƒãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹
+    /// </summary>
+    /// <param name="T"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    BiTNode *flag = NULL;
+    if (!T)
+        return flag;
+    if (T->lchild == NULL || T->rchild == NULL)
+        return flag; //å…ˆæ‰¾åŒäº²ç»“ç‚¹
+    else if ((T->lchild->data).key == e) {
+        flag = T->rchild;
+        return flag;
+    } else if ((T->rchild->data).key == e) {
+        flag = T->lchild;
+        return flag;
+    }
+    flag = GetSibling(T->lchild, e);
+    if (flag != NULL)
+        return flag;
+    flag = GetSibling(T->rchild, e);
+    if (flag != NULL)
+        return flag;
+    return flag;
 }
 
-
-status InsertNode(BiTree& T, KeyType e, int L_or_R, TElemType c)  //²åÈë½áµã¡£
+status InsertNode(BiTree &T, KeyType e, int L_or_R, TElemType c) //æ’å…¥ç»“ç‚¹ã€‚
 {
-	ASSERT_NOT_EMPTY;
-	BiTree flag = LocateNode(T, e);
-	if (!flag) return ERROR;  // ¥Î©`¥Ée¤Ï´æÔÚ¤·¤Ş¤»¤ó
-	if (FindRepetition(T, c.key) == ERROR)
-		return ERROR;  //Í¬¤¸ÃûÇ°¤Î¥Î©`¥É¤¬¤¹¤Ç¤Ë´æÔÚ¤·¤Ş¤¹
-	// ĞÂ¤·¤¤¥Î©`¥É¤ò³õÆÚ»¯¤·¤Ş¤¹
-	BiTNode* r = new BiTNode;
-	if (!r) return OVERFLOW;
+    ASSERT_NOT_EMPTY;
+    BiTree flag = LocateNode(T, e);
+    if (!flag)
+        return ERROR; // ãƒãƒ¼ãƒ‰eã¯å­˜åœ¨ã—ã¾ã›ã‚“
+    if (FindRepetition(T, c.key) == ERROR)
+        return ERROR; //åŒã˜åå‰ã®ãƒãƒ¼ãƒ‰ãŒã™ã§ã«å­˜åœ¨ã—ã¾ã™
+    // æ–°ã—ã„ãƒãƒ¼ãƒ‰ã‚’åˆæœŸåŒ–ã—ã¾ã™
+    BiTNode *r = new BiTNode;
+    if (!r)
+        return OVERFLOW;
 
-	if (L_or_R == ROOT) {
-		r->data = c;
-		r->rchild = T;
-		r->lchild = NULL;
-		T = r;
-		return OK;
-	}
-	else if (L_or_R == LEFT) {
-		BiTree Lnode = flag->lchild;
-		flag->lchild = r;
-		r->data = c;
-		r->rchild = Lnode;
-		r->lchild = NULL;
-		return OK;
-	}
-	else if (L_or_R == RIGHT) {
-		BiTree Rnode = flag->rchild;
-		flag->rchild = r;
-		r->data = c;
-		r->rchild = Rnode;
-		r->lchild = NULL;
-		return OK;
-	}
-	return ERROR;
+    if (L_or_R == ROOT) {
+        r->data = c;
+        r->rchild = T;
+        r->lchild = NULL;
+        T = r;
+        return OK;
+    } else if (L_or_R == LEFT) {
+        BiTree Lnode = flag->lchild;
+        flag->lchild = r;
+        r->data = c;
+        r->rchild = Lnode;
+        r->lchild = NULL;
+        return OK;
+    } else if (L_or_R == RIGHT) {
+        BiTree Rnode = flag->rchild;
+        flag->rchild = r;
+        r->data = c;
+        r->rchild = Rnode;
+        r->lchild = NULL;
+        return OK;
+    }
+    return ERROR;
 }
 
 BiTree FindParent(BiTree T, KeyType e) {
-	if (!T) return NULL; // ¿Õ¤Î¶ş·ÖÄ¾¤ò²Ù×÷¤¹¤ë¤³¤È¤Ï¤Ç¤­¤Ş¤»¤ó
-	BiTNode* flag = NULL;
-	if (T->lchild == NULL && T->rchild == NULL) return NULL;  //TÃ»ÓĞº¢×Ó½áµã£¬¼´Ã»ÓĞ½áµãµÄË«Ç×½áµãÊÇT
-	else if (T->lchild != NULL && T->rchild == NULL)
-	{
-		if (T->lchild->data.key == e) return T;
-	}
-	else if (T->rchild != NULL && T->lchild == NULL)
-	{
-		if (T->rchild->data.key == e) return T;
-	}
-	else if (T->lchild->data.key == e || T->rchild->data.key == e) 
-		return T;
-	flag = FindParent(T->lchild, e);
-	if (flag != NULL) return flag;
-	flag = FindParent(T->rchild, e);
-	return flag;
+    if (!T)
+        return NULL; // ç©ºã®äºŒåˆ†æœ¨ã‚’æ“ä½œã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“
+    BiTNode *flag = NULL;
+    if (T->lchild == NULL && T->rchild == NULL)
+        return NULL; // Tæ²¡æœ‰å­©å­ç»“ç‚¹ï¼Œå³æ²¡æœ‰ç»“ç‚¹çš„åŒäº²ç»“ç‚¹æ˜¯T
+    else if (T->lchild != NULL && T->rchild == NULL) {
+        if (T->lchild->data.key == e)
+            return T;
+    } else if (T->rchild != NULL && T->lchild == NULL) {
+        if (T->rchild->data.key == e)
+            return T;
+    } else if (T->lchild->data.key == e || T->rchild->data.key == e)
+        return T;
+    flag = FindParent(T->lchild, e);
+    if (flag != NULL)
+        return flag;
+    flag = FindParent(T->rchild, e);
+    return flag;
 }
-status DeleteNode(BiTree& T, KeyType e)  //É¾³ı½áµã¡£
+status DeleteNode(BiTree &T, KeyType e) //åˆ é™¤ç»“ç‚¹ã€‚
 {
-	ASSERT_NOT_EMPTY;
-	BiTree Loc_e = LocateNode(T, e);  // To find the location of "e"
-	if (!Loc_e) return ERROR;
+    ASSERT_NOT_EMPTY;
+    BiTree Loc_e = LocateNode(T, e); // To find the location of "e"
+    if (!Loc_e)
+        return ERROR;
 
-	BiTree pl = NULL, pr = NULL, parent;
-	parent = FindParent(T, e);  // To find the parent of Node "e"
-	//if (!parent) return ERROR;
-	if (!Loc_e->lchild && !Loc_e->rchild && parent) // Case: e has no child (e is a leaf)
-	{
-		if (parent->lchild == Loc_e)  parent->lchild = NULL;
-		if (parent->rchild == Loc_e)  parent->rchild = NULL;
-		free(Loc_e);
-		Loc_e = NULL;
-		return OK;
-	}
-	/* e¤Ï¥ë©`¥È¥Î©`¥É¤Ç¤Ï¤¢¤ê¤Ş¤»¤ó */
-	if (Loc_e != T)
-	{
-		if (!parent) return ERROR;
-		if (parent->lchild == Loc_e)
-			pl = Loc_e;
-		else if (parent->rchild == Loc_e)
-			pr = Loc_e;
-	}
-	else {/* e¤Ï¥ë©`¥È¥Î©`¥É¤Ç¤¹ */
-		if (Loc_e->lchild == NULL && Loc_e->rchild)  //deg == 1
-			T = Loc_e->rchild;
-		else if (Loc_e->rchild == NULL && Loc_e->lchild)
-			T = Loc_e->lchild;
-		else if (Loc_e->rchild == NULL && Loc_e->lchild == NULL)  /* Ö±½Ó¥ê¥ê©`¥¹ */
-		{
-			free(Loc_e);
-			return OK;
-		}
-		else  //deg == 2
-		{
-			BiTree temp1 = Loc_e->lchild, temp2 = temp1->rchild;
-			while (temp2)   //ÕÒ×ó×ÓÊ÷µÄ×îÓÒ½áµã
-			{
-				temp1 = temp2;
-				temp2 = temp2->rchild;
-			}
-			temp1->rchild = Loc_e->rchild;
-			T = Loc_e->lchild;
-			free(Loc_e);
-			Loc_e = NULL;
-		}
-		return OK;
-
-	}
-	if (Loc_e->lchild && !Loc_e->rchild)  //½áµãe²»ÊÇ¸ù½ÚµãÇÒ¶ÈÎª1
-	{
-		if (pl)
-			parent->lchild = Loc_e->lchild;//parentÎª¿ÕÖ¸ÕëµÄÇé¿öÔÚÉÏÃæÒÑ¾­ÌÖÂÛ¹ı
-		else if (pr)
-			parent->rchild = Loc_e->lchild;
-		free(Loc_e);
-		Loc_e = NULL;
-	}
-	else if (Loc_e->rchild && !Loc_e->lchild)//½áµãe²»ÊÇ¸ù½ÚµãÇÒ¶ÈÎª1
-	{
-		if (pl)
-			parent->lchild = Loc_e->rchild;
-		else if (pr)
-			parent->rchild = Loc_e->rchild;
-		free(Loc_e);
-		Loc_e = NULL;
-	}
-	else if (Loc_e->rchild && Loc_e->lchild) //½áµãe²»ÊÇ¸ù½ÚµãÇÒ¶ÈÎª2
-	{
-		if (parent->lchild == Loc_e)
-			parent->lchild = Loc_e->lchild;
-		if (parent->rchild == Loc_e)
-			parent->rchild = Loc_e->lchild;
-		BiTree temp1 = Loc_e->lchild, temp2 = temp1->rchild;
-		while (temp2)
-		{
-			temp1 = temp2;
-			temp2 = temp2->rchild;
-		}
-		temp1->rchild = Loc_e->rchild;
-		if (Loc_e == T)
-			T = pl;
-		free(Loc_e);
-		Loc_e = NULL;
-	}
-	return OK;
-}
-
-void visit(BiTree T)
-{
-	printf(" %d,%s", T->data.key, T->data.others);
-}
-status PreOrderTraverse(BiTree T, void (*visit)(BiTree))  //ÏÈĞò±éÀú¶ş²æÊ÷T
-{
-	ASSERT_NOT_EMPTY;
-	if (T)
-	{
-		visit(T);
-		PreOrderTraverse(T->lchild, visit);
-		PreOrderTraverse(T->rchild, visit);
-	}
-	return OK;
+    BiTree pl = NULL, pr = NULL, parent;
+    parent = FindParent(T, e); // To find the parent of Node "e"
+    // if (!parent) return ERROR;
+    if (!Loc_e->lchild && !Loc_e->rchild &&
+        parent) // Case: e has no child (e is a leaf)
+    {
+        if (parent->lchild == Loc_e)
+            parent->lchild = NULL;
+        if (parent->rchild == Loc_e)
+            parent->rchild = NULL;
+        free(Loc_e);
+        Loc_e = NULL;
+        return OK;
+    }
+    /* eã¯ãƒ«ãƒ¼ãƒˆãƒãƒ¼ãƒ‰ã§ã¯ã‚ã‚Šã¾ã›ã‚“ */
+    if (Loc_e != T) {
+        if (!parent)
+            return ERROR;
+        if (parent->lchild == Loc_e)
+            pl = Loc_e;
+        else if (parent->rchild == Loc_e)
+            pr = Loc_e;
+    } else { /* eã¯ãƒ«ãƒ¼ãƒˆãƒãƒ¼ãƒ‰ã§ã™ */
+        if (Loc_e->lchild == NULL && Loc_e->rchild) // deg == 1
+            T = Loc_e->rchild;
+        else if (Loc_e->rchild == NULL && Loc_e->lchild)
+            T = Loc_e->lchild;
+        else if (Loc_e->rchild == NULL &&
+                 Loc_e->lchild == NULL) /* ç›´æ¥ãƒªãƒªãƒ¼ã‚¹ */
+        {
+            free(Loc_e);
+            return OK;
+        } else // deg == 2
+        {
+            BiTree temp1 = Loc_e->lchild, temp2 = temp1->rchild;
+            while (temp2) //æ‰¾å·¦å­æ ‘çš„æœ€å³ç»“ç‚¹
+            {
+                temp1 = temp2;
+                temp2 = temp2->rchild;
+            }
+            temp1->rchild = Loc_e->rchild;
+            T = Loc_e->lchild;
+            free(Loc_e);
+            Loc_e = NULL;
+        }
+        return OK;
+    }
+    if (Loc_e->lchild && !Loc_e->rchild) //ç»“ç‚¹eä¸æ˜¯æ ¹èŠ‚ç‚¹ä¸”åº¦ä¸º1
+    {
+        if (pl)
+            parent->lchild =
+                Loc_e->lchild; // parentä¸ºç©ºæŒ‡é’ˆçš„æƒ…å†µåœ¨ä¸Šé¢å·²ç»è®¨è®ºè¿‡
+        else if (pr)
+            parent->rchild = Loc_e->lchild;
+        free(Loc_e);
+        Loc_e = NULL;
+    } else if (Loc_e->rchild && !Loc_e->lchild) //ç»“ç‚¹eä¸æ˜¯æ ¹èŠ‚ç‚¹ä¸”åº¦ä¸º1
+    {
+        if (pl)
+            parent->lchild = Loc_e->rchild;
+        else if (pr)
+            parent->rchild = Loc_e->rchild;
+        free(Loc_e);
+        Loc_e = NULL;
+    } else if (Loc_e->rchild && Loc_e->lchild) //ç»“ç‚¹eä¸æ˜¯æ ¹èŠ‚ç‚¹ä¸”åº¦ä¸º2
+    {
+        if (parent->lchild == Loc_e)
+            parent->lchild = Loc_e->lchild;
+        if (parent->rchild == Loc_e)
+            parent->rchild = Loc_e->lchild;
+        BiTree temp1 = Loc_e->lchild, temp2 = temp1->rchild;
+        while (temp2) {
+            temp1 = temp2;
+            temp2 = temp2->rchild;
+        }
+        temp1->rchild = Loc_e->rchild;
+        if (Loc_e == T)
+            T = pl;
+        free(Loc_e);
+        Loc_e = NULL;
+    }
+    return OK;
 }
 
-status InOrderTraverse(BiTree T, void (*visit)(BiTree))  //ÖĞĞò±éÀú¶ş²æÊ÷T£¨·Çµİ¹é£©
+void visit(BiTree T) { printf(" %d,%s", T->data.key, T->data.others); }
+status PreOrderTraverse(BiTree T, void (*visit)(BiTree)) //å…ˆåºéå†äºŒå‰æ ‘T
 {
-	ASSERT_NOT_EMPTY;
-	struct BiTNode* st[20]; //¶¨ÒåÖ¸ÕëÕ»st[20]
-	int top = 0; //ÖÃ¿ÕÕ»
-	BiTree t = T;
-	do
-	{
-		while (t) //¸ùÖ¸Õët±íÊ¾µÄÎª·Ç¿Õ¶ş²æÊ÷
-		{
-			if (top == 19) exit(OVERFLOW);//Õ»ÒÑÂú,ÍË³ö
-			st[++top] = t; //¸ùÖ¸Õë½øÕ»(·Ç¿ÕÖ¸Õë£©
-			t = t->lchild; //tÒÆÏò×ó×ÓÊ÷
-		}//Ñ­»·½áÊø±íÊ¾ÒÔÕ»¶¥ÔªËØÎª¸ùÖ¸ÕëµÄ¶ş²æÊ÷µÄ×ó×ÓÊ÷±éÀú½áÊø
-		if (top) //Îª·Ç¿ÕÕ»
-		{
-			t = st[top--];
-			visit(t);//µ¯³ö¸ùÖ¸Õë·ÃÎÊ¸ù½áµã
-			t = t->rchild; //±éÀúÓÒ×ÓÊ÷
-		}
-	} while (top || t);
-	return ERROR;
+    ASSERT_NOT_EMPTY;
+    if (T) {
+        visit(T);
+        PreOrderTraverse(T->lchild, visit);
+        PreOrderTraverse(T->rchild, visit);
+    }
+    return OK;
 }
 
-status PostOrderTraverse(BiTree T, void (*visit)(BiTree))  //ºóĞò±éÀú¶ş²æÊ÷T
+status InOrderTraverse(BiTree T,
+                       void (*visit)(BiTree)) //ä¸­åºéå†äºŒå‰æ ‘Tï¼ˆéé€’å½’ï¼‰
 {
-	ASSERT_NOT_EMPTY;
-	if (T)
-	{
-		PostOrderTraverse(T->lchild, visit);
-		PostOrderTraverse(T->rchild, visit);
-		visit(T);
-	}
-	return OK;
+    ASSERT_NOT_EMPTY;
+    struct BiTNode *st[20]; //å®šä¹‰æŒ‡é’ˆæ ˆst[20]
+    int top = 0;            //ç½®ç©ºæ ˆ
+    BiTree t = T;
+    do {
+        while (t) //æ ¹æŒ‡é’ˆtè¡¨ç¤ºçš„ä¸ºéç©ºäºŒå‰æ ‘
+        {
+            if (top == 19)
+                exit(OVERFLOW); //æ ˆå·²æ»¡,é€€å‡º
+            st[++top] = t;      //æ ¹æŒ‡é’ˆè¿›æ ˆ(éç©ºæŒ‡é’ˆï¼‰
+            t = t->lchild;      // tç§»å‘å·¦å­æ ‘
+        } //å¾ªç¯ç»“æŸè¡¨ç¤ºä»¥æ ˆé¡¶å…ƒç´ ä¸ºæ ¹æŒ‡é’ˆçš„äºŒå‰æ ‘çš„å·¦å­æ ‘éå†ç»“æŸ
+        if (top) //ä¸ºéç©ºæ ˆ
+        {
+            t = st[top--];
+            visit(t);      //å¼¹å‡ºæ ¹æŒ‡é’ˆè®¿é—®æ ¹ç»“ç‚¹
+            t = t->rchild; //éå†å³å­æ ‘
+        }
+    } while (top || t);
+    return ERROR;
 }
 
-status LevelOrderTraverse(BiTree T, void (*visit)(BiTree))   //°´²ã±éÀú¶ş²æÊ÷T
+status PostOrderTraverse(BiTree T, void (*visit)(BiTree)) //ååºéå†äºŒå‰æ ‘T
 {
-	BiTree st[20];  //¶¨ÒåÒ»¸ö¶ÓÁĞ
-	int head = 0;
-	if (T)
-	{
-		st[head++] = T;
-	}
-	while (head > 0)
-	{
-		if (head == 19) return OVERFLOW;
-		BiTree p = *st;
-		visit(p);
-		head--;
-		for (int i = 0; i < head; i++)
-			st[i] = st[i + 1];
-		if (p->lchild)
-			st[head++] = p->lchild;
-		if (p->rchild)
-			st[head++] = p->rchild;
-	}
-	return OK;
+    ASSERT_NOT_EMPTY;
+    if (T) {
+        PostOrderTraverse(T->lchild, visit);
+        PostOrderTraverse(T->rchild, visit);
+        visit(T);
+    }
+    return OK;
 }
 
-status AddBiTree(TREELISTS& treelist, char treename[])
+status LevelOrderTraverse(BiTree T, void (*visit)(BiTree)) //æŒ‰å±‚éå†äºŒå‰æ ‘T
 {
-	if (treelist.length >= 10)   return ERROR;
-	for (int i = 0; i < treelist.length; ++i) {
-		if (strcmp(treelist.elem[i].name, treename) == 0)
-			return ERROR;
-	}
-	/* ¥Î©`¥É¤ò³õÆÚ»¯¤·¤Ş¤¹ */
-	strcpy(treelist.elem[treelist.length].name, treename);
-	treelist.elem[treelist.length].T = NULL;
-	treelist.length++;
-	return OK;
+    BiTree st[20]; //å®šä¹‰ä¸€ä¸ªé˜Ÿåˆ—
+    int head = 0;
+    if (T) {
+        st[head++] = T;
+    }
+    while (head > 0) {
+        if (head == 19)
+            return OVERFLOW;
+        BiTree p = *st;
+        visit(p);
+        head--;
+        for (int i = 0; i < head; i++)
+            st[i] = st[i + 1];
+        if (p->lchild)
+            st[head++] = p->lchild;
+        if (p->rchild)
+            st[head++] = p->rchild;
+    }
+    return OK;
 }
 
-status DelBiTree(TREELISTS& treelist, char treename[]) // ¶ş·ÖÄ¾¤òÏ÷³ı¤¹¤ë
-{
-	for (int i = 0; i < treelist.length; i++)
-	{
-		if (!strcmp(treename, treelist.elem[i].name))
-		{
-			ClearBiTree(treelist.elem[i].T);
-			for (int j = i; j < treelist.length; j++)
-			{
-				strcpy(treelist.elem[i].name, treelist.elem[i + 1].name);
-				treelist.elem[i].T = treelist.elem[i + 1].T;
-			}
-			treelist.length--;
-			return OK;
-		}
-	}
-	return ERROR;
+status AddBiTree(TREELISTS &treelist, char treename[]) {
+    if (treelist.length >= 10)
+        return ERROR;
+    for (int i = 0; i < treelist.length; ++i) {
+        if (strcmp(treelist.elem[i].name, treename) == 0)
+            return ERROR;
+    }
+    /* ãƒãƒ¼ãƒ‰ã‚’åˆæœŸåŒ–ã—ã¾ã™ */
+    strcpy(treelist.elem[treelist.length].name, treename);
+    treelist.elem[treelist.length].T = NULL;
+    treelist.length++;
+    return OK;
 }
 
-int LocateTree(TREELISTS treelist, char ListName[])// ²éÕÒ¶ş²æÊ÷
+status DelBiTree(TREELISTS &treelist, char treename[]) // äºŒåˆ†æœ¨ã‚’å‰Šé™¤ã™ã‚‹
 {
-	for (int i = 0; i < treelist.length; i++)
-	{
-		if (!strcmp(ListName, treelist.elem[i].name))
-			return i + 1;
-	}
-	return 0;
+    for (int i = 0; i < treelist.length; i++) {
+        if (!strcmp(treename, treelist.elem[i].name)) {
+            ClearBiTree(treelist.elem[i].T);
+            for (int j = i; j < treelist.length; j++) {
+                strcpy(treelist.elem[i].name, treelist.elem[i + 1].name);
+                treelist.elem[i].T = treelist.elem[i + 1].T;
+            }
+            treelist.length--;
+            return OK;
+        }
+    }
+    return ERROR;
 }
 
-status SaveBiTree(BiTree T, char FileName[]) //½«¶ş²æÊ÷µÄ½áµãÊı¾İĞ´Èëµ½ÎÄ¼şFileNameÖĞ
+int LocateTree(TREELISTS treelist, char ListName[]) // æŸ¥æ‰¾äºŒå‰æ ‘
 {
-	char rs[100] = "null";
-	FILE* fp = fopen(FileName, "wt");
-	if (!fp) return FILEERROR;
-	BiTree s[100];
-	int top = 0;
-	do
-	{
-		while (T)
-		{
-			s[++top] = T;
-			fprintf(fp, "%d %s ", T->data.key, T->data.others);//·Çµİ¹éÇ°Ğò±éÀú
-			T = T->lchild;
-		}
-		fprintf(fp, "%d %s ", 0, rs);//Êä³ö0±íÊ¾Îª¿ÕÊ÷
-		if (top)
-		{
-			T = s[top--];
-			T = T->rchild;
-		}
-	} while (top || T);
-	fprintf(fp, "%d %s ", 0, rs);//Êä³ö0±íÊ¾Îª¿ÕÊ÷
-	fprintf(fp, "-1 null ");
-	fclose(fp);
-
-	return OK;
+    for (int i = 0; i < treelist.length; i++) {
+        if (!strcmp(ListName, treelist.elem[i].name))
+            return i + 1;
+    }
+    return 0;
 }
 
-status LoadBiTree(BiTree& T, char FileName[])  //¶ÁÈëÎÄ¼şFileNameµÄ½áµãÊı¾İ£¬´´½¨¶ş²æÊ÷
+status SaveBiTree(BiTree T,
+                  char FileName[]) //å°†äºŒå‰æ ‘çš„ç»“ç‚¹æ•°æ®å†™å…¥åˆ°æ–‡ä»¶FileNameä¸­
 {
-	TElemType def1[20];
-	memset(def1, 0, sizeof(def1));
-	FILE* fp = fopen(FileName, "r");
-	if (!fp) return FILEERROR;
-	for (int i = 0;; i++)
-	{
-		fscanf(fp, "%d%s", &def1[i].key, def1[i].others);
-		if (def1[i].key == -1)
-			break;
-	}
-	CreateBiTree(T, def1);
-	fclose(fp);
-	return OK;
+    /// <summary>
+    /// Save BiTree to a certain file
+    /// </summary>
+    /// <param name="T">Root of BiTree</param>
+    /// <param name="FileName">FileName</param>
+    /// <returns>INFEASIBLE, FILEERROR, ERROR, OK</returns>
+    if (!T) return INFEASIBLE;
+    char rs[100] = "null";
+    FILE *fp = fopen(FileName, "wt");
+    if (!fp)
+        return FILEERROR;
+    BiTree s[100];
+    int top = 0;
+    do {
+        while (T) {
+            s[++top] = T;
+            fprintf(fp, "%d %s ", T->data.key, T->data.others); //éé€’å½’å‰åºéå†
+            T = T->lchild;
+        }
+        fprintf(fp, "%d %s ", 0, rs); //è¾“å‡º0è¡¨ç¤ºä¸ºç©ºæ ‘
+        if (top) {
+            T = s[top--];
+            T = T->rchild;
+        }
+    } while (top || T);
+    fprintf(fp, "%d %s ", 0, rs); //è¾“å‡º0è¡¨ç¤ºä¸ºç©ºæ ‘
+    fprintf(fp, "-1 null ");
+    fclose(fp);
+
+    return OK;
+}
+
+status LoadBiTree(BiTree &T,
+                  char FileName[]) //è¯»å…¥æ–‡ä»¶FileNameçš„ç»“ç‚¹æ•°æ®ï¼Œåˆ›å»ºäºŒå‰æ ‘
+{
+    if (T) return INFEASIBLE;
+    TElemType def1[20];
+    memset(def1, 0, sizeof(def1));
+    FILE *fp = fopen(FileName, "r");
+    if (!fp)
+        return FILEERROR;
+    for (int i = 0;; i++) {
+        fscanf(fp, "%d%s", &def1[i].key, def1[i].others);
+        if (def1[i].key == -1)
+            break;
+    }
+    CreateBiTree(T, def1);
+    fclose(fp);
+    return OK;
 }
 
 inline bool isEmpty(BiTree T) {
-	if (T) return false;
-	else return true;
+    if (T)
+        return false;
+    else
+        return true;
 }

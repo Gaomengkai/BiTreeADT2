@@ -38,9 +38,9 @@ typedef struct
     int length;
 }TREELISTS;
 
-status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree T, TElemType definition[], int repeating[]);
-status CreateBiTree(BiTree T, TElemType definition[]);
-status ClearBiTree(BiTree T);
+status CreateBiTreeTrueFunctionToDoCheckRepeating(BiTree &T, TElemType definition[], int repeating[], TElemType*& cp);
+status CreateBiTree(BiTree &T, TElemType definition[]);
+status ClearBiTree(BiTree& T);
 int BiTreeDepth(BiTree T);
 BiTNode* LocateNode(BiTree T, KeyType e);
 status FindRepetition(BiTree& T, KeyType e);
