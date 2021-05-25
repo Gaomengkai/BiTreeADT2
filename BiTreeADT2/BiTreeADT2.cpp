@@ -24,7 +24,7 @@ BiTree Second_menu(BiTree T, TREELISTS& treelist) {
 	while (op) {
 		system("cls");
 		printf("\n\n");
-		printf("                     菜单选项 \n");
+		printf("                     二级菜单选项 \n");
 		printf("---------------------------------------------------------------"
 			"--\n");
 		printf(" 1. 创建二叉树                         2. 清空二叉树\n");
@@ -32,9 +32,10 @@ BiTree Second_menu(BiTree T, TREELISTS& treelist) {
 			"寻找结点位置并返回地址\n");
 		printf(" 5. 给结点赋值                         6. 兄弟结点\n");
 		printf(" 7. 插入结点                           8. 删除结点\n");
-		printf(" 9. 先序遍历                       10. 中序遍历\n");
+		printf(" 9. 先序遍历                          10. 中序遍历\n");
 		printf(" 11. 后序遍历                          12. 按层遍历\n");
-		printf(" 13. 保存文件              14. "
+		puts("\n文件操作：");
+		printf(" 13. 保存文件                          14. "
 			"加载文件\n");
 		printf(" 0. 输入0可返回上一级菜单\n");
 		printf("---------------------------------------------------------------"
@@ -221,6 +222,7 @@ BiTree Second_menu(BiTree T, TREELISTS& treelist) {
 			st = LoadBiTree(T, filename);
 			if (st == FILEERROR) {
 				cout << "文件打开错误！";
+				break;
 			}
 			else
 				printf("导入成功！\n");
@@ -237,6 +239,7 @@ BiTree Second_menu(BiTree T, TREELISTS& treelist) {
 	return T;
 }
 int main() {
+	system("color f0");// White background, Black Text
 	TREELISTS treelist;
 	BiTree T = NULL;
 
@@ -254,8 +257,9 @@ int main() {
 			"--\n");
 		printf("1. 增加二叉树                          2. 删除指定二叉树\n");
 		printf("3. 查找二叉树                          4. 选中二叉树\n");
+		puts("\n文件操作：");
 		printf("5. 保存某个二叉树                      6. 从文件加载二叉树\n");
-		puts("100. 声明。\n");
+		puts("\n100. 声明。");
 		printf("0. 输入0可退出系统\n");
 		printf("---------------------------------------------------------------"
 			"--\n");
@@ -312,15 +316,15 @@ int main() {
 			else {
 				T = treelist.elem[result - 1].T;
 				if (isEmpty(T)) {
-					cout << "二分木が空で、操作が禁止されています！\n";
+					cout << "[EMPTY]\t二分木が空で、操作が禁止されています！\n";
 					break;
 				}
 				cout << "请输入要保存的文件名：";
 				cin >> filename;
 				result = SaveBiTree(T, filename);
-				if (result == FILEERROR) cout << "ファイルオープンエラー\n";
+				if (result == FILEERROR) cout << "[FILE]\tファイルオープンエラー\n";
 				else if (result == OK) cout << "保存成功！\n";
-				else if (result == INFEASIBLE) cout << "二分木が空で\n";
+				else if (result == INFEASIBLE) cout << "[EMPTY]\t二分木が空で\n";
 				break;
 			}
 		case 6:
@@ -334,13 +338,17 @@ int main() {
 			}
 			else {
 				AddBiTree(treelist, treename);
-				printf("添加成功！\n");
+				printf("[OK]\t添加成功！\n");
 			}
 			result = LoadBiTree(treelist.elem[treelist.length - 1].T, filename);
-			if (result == OK) cout << "读取成功！\n";
-			else if (result == FILEERROR)cout << "文件读取错误！\n";
-			else if (result == ERROR)cout << "未知错误！\n";
-			else if (result == INFEASIBLE)cout << "二叉树不可操作！\n";
+			if (result == OK) cout << "[OK]\t读取成功！\n";
+			else if (result == FILEERROR) {
+				cout << "[FILE_ERROR]\t文件读取错误！\n";
+				DelBiTree(treelist, treename);
+				cout << "[OK]\t先前创建的二叉树已经删除\n";
+			}
+			else if (result == ERROR)cout << "[ERROR]\t未知错误！\n";
+			else if (result == INFEASIBLE)cout << "[INFEASIBLE]\t二叉树不可操作！\n";
 			else cout << "：（\t未知错误！！！\n";
 			break;
 		case 0:

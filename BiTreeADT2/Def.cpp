@@ -82,8 +82,6 @@ BiTNode *LocateNode(BiTree T, KeyType e) //查找结点
     if (flag != NULL)
         return flag;
     flag = LocateNode(T->rchild, e);
-    if (flag != NULL)
-        return flag;
     return flag;
 }
 
@@ -111,7 +109,7 @@ status FindRepetition(BiTree &T, KeyType e) {
     }
 }
 
-status Assign(BiTree &T, KeyType e, TElemType valve) //实现结点赋值。   ******
+status Assign(BiTree &T, KeyType e, TElemType valve) //实现结点赋值。
 {
     ASSERT_NOT_EMPTY;
     BiTree flag;
@@ -304,9 +302,18 @@ status DeleteNode(BiTree &T, KeyType e) //删除结点。
     }
     return OK;
 }
-
+/// <summary>
+/// 访问函数
+/// </summary>
+/// <param name="T">树</param>
 void visit(BiTree T) { printf(" %d,%s", T->data.key, T->data.others); }
-status PreOrderTraverse(BiTree T, void (*visit)(BiTree)) //先序遍历二叉树T
+/// <summary>
+/// 先序遍历 递归
+/// </summary>
+/// <param name="T">树</param>
+/// <param name="visit">访问函数</param>
+/// <returns></returns>
+status PreOrderTraverse(BiTree T, void (*visit)(BiTree))
 {
     ASSERT_NOT_EMPTY;
     if (T) {
@@ -316,23 +323,28 @@ status PreOrderTraverse(BiTree T, void (*visit)(BiTree)) //先序遍历二叉树
     }
     return OK;
 }
-
+/// <summary>
+/// 中序 非递归遍历
+/// </summary>
+/// <param name="T">树</param>
+/// <param name="visit">访问函数</param>
+/// <returns></returns>
 status InOrderTraverse(BiTree T,
-                       void (*visit)(BiTree)) //中序遍历二叉树T（非递归）
+                       void (*visit)(BiTree))
 {
     ASSERT_NOT_EMPTY;
-    struct BiTNode *st[20]; //定义指针栈st[20]
-    int top = 0;            //置空栈
+    struct BiTNode *st[MAX_QUEUE_DEPTH]; // the simulated pointer stack
+    int top = 0;   // set stack to EMPTY
     BiTree t = T;
     do {
         while (t) //根指针t表示的为非空二叉树
         {
-            if (top == 19)
-                exit(OVERFLOW); //栈已满,退出
-            st[++top] = t;      //根指针进栈(非空指针）
-            t = t->lchild;      // t移向左子树
-        } //循环结束表示以栈顶元素为根指针的二叉树的左子树遍历结束
-        if (top) //为非空栈
+            if (top == MAX_QUEUE_DEPTH-1)
+                exit(OVERFLOW);
+            st[++top] = t;
+            t = t->lchild;// t was tuened to left child
+        } // Left Tree was OK
+        if (top) 
         {
             t = st[top--];
             visit(t);      //弹出根指针访问根结点
@@ -355,27 +367,34 @@ status PostOrderTraverse(BiTree T, void (*visit)(BiTree)) //后序遍历二叉�
 
 status LevelOrderTraverse(BiTree T, void (*visit)(BiTree)) //按层遍历二叉树T
 {
-    BiTree st[20]; //定义一个队列
+    BiTree q[MAX_QUEUE_DEPTH];
     int head = 0;
     if (T) {
-        st[head++] = T;
+        q[head++] = T;
     }
     while (head > 0) {
-        if (head == 19)
-            return OVERFLOW;
-        BiTree p = *st;
+        if (head == MAX_QUEUE_DEPTH - 1)
+            return OVERFLOW; // OVERFLOW!!
+        BiTree p = *q;
         visit(p);
         head--;
-        for (int i = 0; i < head; i++)
-            st[i] = st[i + 1];
+        // Seq the queue
+        for (int i = 0; i < head; ++i)
+            q[i] = q[i + 1];
         if (p->lchild)
-            st[head++] = p->lchild;
+            q[head++] = p->lchild;
         if (p->rchild)
-            st[head++] = p->rchild;
+            q[head++] = p->rchild;
     }
     return OK;
 }
 
+/// <summary>
+/// 添加一个二叉树
+/// </summary>
+/// <param name="treelist">总的二叉树列表</param>
+/// <param name="treename">二叉树名字</param>
+/// <returns>ERROR (Too Many / Repeat) or OK</returns>
 status AddBiTree(TREELISTS &treelist, char treename[]) {
     if (treelist.length >= 10)
         return ERROR;
@@ -390,6 +409,12 @@ status AddBiTree(TREELISTS &treelist, char treename[]) {
     return OK;
 }
 
+/// <summary>
+/// 在总的列表中删除一个二叉树
+/// </summary>
+/// <param name="treelist">总的列表</param>
+/// <param name="treename">二叉树名字</param>
+/// <returns>ERROR / OK</returns>
 status DelBiTree(TREELISTS &treelist, char treename[]) // 二分木を削除する
 {
     for (int i = 0; i < treelist.length; i++) {

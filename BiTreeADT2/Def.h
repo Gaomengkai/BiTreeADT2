@@ -65,3 +65,4 @@ inline bool isEmpty(BiTree T);
 const int ROOT = -1;
 const int LEFT = 0;
 const int RIGHT = 1;
+const int MAX_QUEUE_DEPTH = 50;
